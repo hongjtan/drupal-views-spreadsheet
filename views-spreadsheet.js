@@ -1,7 +1,7 @@
 /*!
  * @brief 		Allows the user to select table cells in a Drupal view and sums or subtracts the values in the selected cells.
- * @author 	    Hong Jie Tan <hongjtan@gmail.com>
- * @version 	0.2
+ * @author		Hong Jie Tan <hongjtan@gmail.com>
+ * @version		0.2
  * @date		January 2013
  *
  * @section     LICENSE
