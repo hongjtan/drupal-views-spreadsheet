@@ -33,12 +33,15 @@ jQuery(document).ready(function ($) {
 	background_color = get_cookie("views-spreadsheet-bg-color") ? get_cookie("views-spreadsheet-bg-color") : "#FFFFFF";
 	font_color = get_cookie("views-spreadsheet-font-color") ? get_cookie("views-spreadsheet-font-color") : "#000000";
 	enable_ctrl = get_cookie("views-spreadsheet-en-ctrl") === "true" ? true : false;
+	enable_tooltip = get_cookie("views-spreadsheet-en-tooltip" === "true") ? true : false;
+	border_color_a = get_cookie("views-spreadsheet-bordera-color") ? get_cookie("views-spreadsheet-bordera-color") : "#669933";
+	border_color_s = get_cookie("views-spreadsheet-borders-color") ? get_cookie("views-spreadsheet-borders-color") : "#FF9900";
 
 	$("#page #content .view").append("<div id='views-spreadsheet-sum-container'></div>");
 	var views_spreadsheet_sum_container = $("#views-spreadsheet-sum-container");
 
 	views_spreadsheet_sum_container.css({
-		"display"        :     "block",
+		"display"        :     "none",
 		"position"       :     "fixed",
 		"background"     :     background_color,
 		"width"          :     "200px",
@@ -46,7 +49,7 @@ jQuery(document).ready(function ($) {
 		"right"          :     "100px",
 		"bottom"         :     "15px",
 		"border-radius"  :     "6px",
-		"border"         :     "3px solid green",
+		"border"         :     "3px solid " + border_color_a,
 		"color"          :     font_color,
 		"visibility"     :     "hidden",
 		"opacity"        :     "0",
@@ -58,8 +61,8 @@ jQuery(document).ready(function ($) {
 		$(this).fadeTo(300, 1.0);
 	});*/
 
-	views_spreadsheet_sum_container.append(
-			"<span id='views-spreadsheet-number-selected' class='views-spreadsheet-num-cells views-spreadsheet-left'>Cells: </span>"
+	views_spreadsheet_sum_container.append("<span id='views-spreadsheet-title'>Views Spreadsheet</span>"
+		).append("<span id='views-spreadsheet-number-selected' class='views-spreadsheet-num-cells views-spreadsheet-left'>Cells: </span>"
 			+ "<span id='views-spreadsheet-num-cells' class='views-spreadsheet-num-cells views-spreadsheet-right'>"
 			+ selected_list.length
 			+ "</span>"
@@ -68,37 +71,61 @@ jQuery(document).ready(function ($) {
 			"<span id='views-spreadsheet-sum' class='views-spreadsheet-sum views-spreadsheet-left'>Sum: </span>"
 			+ "<span id='views-spreadsheet-sum-display' class='views-spreadsheet-sum views-spreadsheet-right'>"
 			+ sum.toFixed(2)
-			+ "</span>");
+			+ "</span>"
+		);
+
+	$("#views-spreadsheet-title").css({
+		"position"     :     "absolute",
+		"top"          :     "2px",
+		"left"         :     "5px",
+	});
 
 	$(".views-spreadsheet-left").css({
-		"float"           :     "left",
-		"margin-left"     :     "5px",
+		"position"     :     "relative",
+		"float"        :     "left",
+		"left"         :     "5px",
 	});
 	$(".views-spreadsheet-right").css({
-		"float"            :     "right",
-		"margin-right"     :     "35px",
+		"position"      :     "relative",
+		"float"         :     "right",
+		"right"         :     "31px",
 	});
 
 	$(".views-spreadsheet-num-cells").css({
-		"margin-top"     :     "20px"
+		"top"     :     "25px",
+	});
+
+	$(".views-spreadsheet-sum").css({
+		"top"     :     "5px",
 	});
 
 	$("#views-spreadsheet-sum-container span").css({
 		//"line-height"   :     "18px",
 		"text-align"    :     "center",
-		"font-size"     :     "15px",
+		"font-size"     :     "14px",
 		"font-weight"   :     "bold",
 		"text-shadow"   :     "1px 1px #888",
 		"font-family"   :     "Helvetica",
 	});
 
-	views_spreadsheet_sum_container.append("<hr class='views-spreadsheet-bot-rule'/>"
+	views_spreadsheet_sum_container.append("<hr class='views-spreadsheet-top-rule views-spreadsheet-rule'/>"
+		).append("<hr class='views-spreadsheet-bot-rule views-spreadsheet-rule'/>"
 		).append("<div class='views-spreadsheet-right-rule'></div>"
 		).append("<div class='views-spreadsheet-button' id='views-spreadsheet-add-op'>+</div>"
 		).append("<div class='views-spreadsheet-button' id='views-spreadsheet-subtract-op'>-</div>"
 		).append("<div class='views-spreadsheet-button' id='views-spreadsheet-clear-button')>C</div>"
 		).append("<div class='views-spreadsheet-button' id='views-spreadsheet-settings-button'>S</div>"
+		//).after("<div id='views-spreadsheet-tooltip'><span id='views-spreadsheet-tooltip-text'></span></div>"
 		);
+
+		$("#views-spreadsheet-sum-display").after("<div id='views-spreadsheet-tooltip'><span id='views-spreadsheet-tooltip-text'></span></div>");
+
+	$(".views-spreadsheet-rule").css({
+		"position"       :     "absolute",
+		"bottom"         :     "23px",
+		"width"          :     "100%",
+		"background"     :     get_cookie("views-spreadsheet-bordera-color") ? get_cookie("views-spreadsheet-bordera-color") : "#669933",
+	});
 
 	$(".views-spreadsheet-right-rule").css({
 		"position"        :     "absolute",
@@ -106,14 +133,14 @@ jQuery(document).ready(function ($) {
 		"width"           :     "1px",
 		"right"           :     "23px",
 		"top"             :     "0px",
-		"border-left"     :     "1px solid green",
+		"border-left"     :     "1px solid " + border_color_a,
 	});
 
+	$(".views-spreadsheet-top-rule").css({
+		"top"     :     "23px",
+	});
 	$(".views-spreadsheet-bot-rule").css({
-		"position"       :     "absolute",
-		"bottom"         :     "23px",
-		"width"          :     "100%",
-		"background"     :     "green",
+		"bottom"     :     "23px",
 	});
 
 	$(".views-spreadsheet-button").css({
@@ -136,12 +163,73 @@ jQuery(document).ready(function ($) {
 		"left"       :     "20px",
 	});
 
+	var tooltip = $("#views-spreadsheet-tooltip");
+	var tooltip_text = $("#views-spreadsheet-tooltip-text");
+	tooltip.css({
+		"position"          :     "absolute",
+		"top"               :     "-35px",
+		"left"              :     "-3px",
+		"width"             :     "200px",
+		"height"            :     "25px",
+		"border-radius"     :     "6px",
+		"border"            :     "3px solid" + border_color_a,
+		"overflow"           :     "hidden",
+		"background"        :     background_color,
+	}).hide();
+
+	tooltip_text.css({
+		"position"           :     "relative",
+		"display"            :     "block",
+		"top"                :     "1px",
+		"overflow"           :     "hidden",
+		"pointer-events"     :     "none",
+		"font-weight"        :     "normal",
+		"font-size"          :     "11px",
+		"text-align"         :     "center",
+		"margin"             :     "auto auto",
+	});
+
+	/* Bind tooltips to the spreadsheet buttons if enabled. */
+	$(".views-spreadsheet-button").bind({
+		mouseenter: function() {
+			if (get_cookie("views-spreadsheet-en-tooltip") === "true") {
+				var button = $(this).attr("id");
+
+				switch (button) {
+					case "views-spreadsheet-add-op":
+						tooltip_text.text("Change operation to add.");
+						break;
+					case "views-spreadsheet-subtract-op":
+						tooltip_text.text("Change operation to Subtract.");
+						break;
+					case "views-spreadsheet-settings-button":
+						tooltip_text.text("Open settings menu.");
+						break;
+					case "views-spreadsheet-clear-button":
+						tooltip_text.text("Clear selection.");
+						break;
+					default:
+						break;
+				}
+
+				tooltip.stop(true, true).show(400, "easeOutExpo");
+			}
+		},
+		mouseleave: function() {
+			if (get_cookie("views-spreadsheet-en-tooltip") === "true") {
+				tooltip.stop(true, true).hide(400, "easeOutExpo");
+
+				tooltip_text.text("");
+			}
+		}
+	});
+
 	// Change operators when addition or subtraction is chosen.
 	$("#views-spreadsheet-add-op").click(function (event) {
 		selected_op = "+";
 
 		$(".views-spreadsheet-right-rule").css({
-			"border-color"         :     "green",
+			"border-color"         :     get_cookie("views-spreadsheet-bordera-color") ? get_cookie("views-spreadsheet-bordera-color") : "#669933",
 			"WebkitTransition"     :     "border-color 0.4s ease-in-out",
 			"MozTransition"        :     "border-color 0.4s ease-in-out",
 			"MsTransition"         :     "border-color 0.4s ease-in-out",
@@ -149,8 +237,8 @@ jQuery(document).ready(function ($) {
 			"transition"           :     "border-color 0.4s ease-in-out",
 		});
 
-		$(".views-spreadsheet-bot-rule").css({
-			"background"           :     "green",
+		$(".views-spreadsheet-rule").css({
+			"background"           :     get_cookie("views-spreadsheet-bordera-color") ? get_cookie("views-spreadsheet-bordera-color") : "#669933",
 			"WebkitTransition"     :     "background 0.4s ease-in-out",
 			"MozTransition"        :     "background 0.4s ease-in-out",
 			"MsTransition"         :     "background 0.4s ease-in-out",
@@ -159,7 +247,16 @@ jQuery(document).ready(function ($) {
 		});
 
 		views_spreadsheet_sum_container.css({
-			"border-color"         :     "green",
+			"border-color"         :     get_cookie("views-spreadsheet-bordera-color") ? get_cookie("views-spreadsheet-bordera-color") : "#669933",
+			"WebkitTransition"     :     "border-color 0.4s ease-in-out",
+		    "MozTransition"        :     "border-color 0.4s ease-in-out",
+		    "MsTransition"         :     "border-color 0.4s ease-in-out",
+		    "OTransition"          :     "border-color 0.4s ease-in-out",
+		    "transition"           :     "border-color 0.4s ease-in-out",
+		});
+
+		tooltip.css({
+			"border-color"         :     get_cookie("views-spreadsheet-bordera-color") ? get_cookie("views-spreadsheet-bordera-color") : "#669933",
 			"WebkitTransition"     :     "border-color 0.4s ease-in-out",
 		    "MozTransition"        :     "border-color 0.4s ease-in-out",
 		    "MsTransition"         :     "border-color 0.4s ease-in-out",
@@ -171,7 +268,7 @@ jQuery(document).ready(function ($) {
 		selected_op = "-";
 
 		$(".views-spreadsheet-right-rule").css({
-			"border-color"         :     "orange",
+			"border-color"         :     get_cookie("views-spreadsheet-borders-color") ? get_cookie("views-spreadsheet-borders-color") : "#FF9900",
 			"WebkitTransition"     :     "border-color 0.4s ease-in-out",
 			"MozTransition"        :     "border-color 0.4s ease-in-out",
 			"MsTransition"         :     "border-color 0.4s ease-in-out",
@@ -179,8 +276,8 @@ jQuery(document).ready(function ($) {
 			"transition"           :     "border-color 0.4s ease-in-out",
 		});
 
-		$(".views-spreadsheet-bot-rule").css({
-			"background"           :     "orange",
+		$(".views-spreadsheet-rule").css({
+			"background"           :     get_cookie("views-spreadsheet-borders-color") ? get_cookie("views-spreadsheet-borders-color") : "#FF9900",
 			"WebkitTransition"     :     "background 0.4s ease-in-out",
 			"MozTransition"        :     "background 0.4s ease-in-out",
 			"MsTransition"         :     "background 0.4s ease-in-out",
@@ -189,7 +286,16 @@ jQuery(document).ready(function ($) {
 		});
 
 		views_spreadsheet_sum_container.css({
-			"border-color"         :     "orange",
+			"border-color"         :     get_cookie("views-spreadsheet-borders-color") ? get_cookie("views-spreadsheet-borders-color") : "#FF9900",
+			"WebkitTransition"     :     "border-color 0.4s ease-in-out",
+		    "MozTransition"        :     "border-color 0.4s ease-in-out",
+		    "MsTransition"         :     "border-color 0.4s ease-in-out",
+		    "OTransition"          :     "border-color 0.4s ease-in-out",
+		    "transition"           :     "border-color 0.4s ease-in-out",
+		});
+
+		tooltip.css({
+			"border-color"         :     get_cookie("views-spreadsheet-borders-color") ? get_cookie("views-spreadsheet-borders-color") : "#FF9900",
 			"WebkitTransition"     :     "border-color 0.4s ease-in-out",
 		    "MozTransition"        :     "border-color 0.4s ease-in-out",
 		    "MsTransition"         :     "border-color 0.4s ease-in-out",
@@ -205,7 +311,7 @@ jQuery(document).ready(function ($) {
 
 	$("#views-spreadsheet-settings-button").css({
 		"top"		   :     "2px",
-		"right"        :     "2px",
+		"right"        :     "3px",
 		"position"     :     "absolute",
 		"float"        :     "right",
 	});
@@ -243,7 +349,7 @@ jQuery(document).ready(function ($) {
 				"position"       :     "fixed",
 				"background"     :     "white",
 				"width"          :     "500px",
-				"height"         :     "170px",
+				"height"         :     "230px",
 				"top"            :     "0",
 				"left"           :     "0",
 				"right"          :     "0",
@@ -251,7 +357,7 @@ jQuery(document).ready(function ($) {
 				"margin"         :     "auto auto",
 				//"border-radius"  :     "6px",
 				"border"         :     "1px solid black",
-				"color"     :     "black",
+				"color"          :     "black",
 				"opacity"        :     "0",
 			});
 
@@ -308,9 +414,18 @@ jQuery(document).ready(function ($) {
 				).append("<span class='option-text'>Font Color: </span>"
 				).append("<input class='option-textbox' type='text' id='views-spreadsheet-font-color' name='views-spreadsheet-font-color' value='" + (get_cookie("views-spreadsheet-font-color") ? get_cookie("views-spreadsheet-font-color") : "#000000") + "'>"
 				).append("<br/>"
+				).append("<span class='option-text'>Highlight Color [On Add]: </span>"
+				).append("<input class='option-textbox' type='text' id='views-spreadsheet-bordera-color' name='views-spreadsheet-bordera-color' value='" + (get_cookie("views-spreadsheet-bordera-color") ? get_cookie("views-spreadsheet-bordera-color") : "#669933") + "'>"
+				).append("<br/>"
+				).append("<span class='option-text'>Highlight Color [On Subtract]: </span>"
+				).append("<input class='option-textbox' type='text' id='views-spreadsheet-borders-color' name='views-spreadsheet-borders-color' value='" + (get_cookie("views-spreadsheet-borders-color") ? get_cookie("views-spreadsheet-borders-color") : "#FF9900") + "'>"
+				).append("<br/>"
 				).append("<br/>"
 				).append("<span class='option-text'>Enable CTRL [Beta]:</span>"
 				).append("<input class='option-textbox' type='checkbox' id='views-spreadsheet-en-ctrl' name='views-spreadsheet-en-ctrl' " + (get_cookie("views-spreadsheet-en-ctrl") === "true" ? "checked" : "") + ">"
+				).append("<br/>"
+				).append("<span class='option-text'>Enable Tooltips:</span>"
+				).append("<input class='option-textbox' type='checkbox' id='views-spreadsheet-en-tooltip' name='views-spreadsheet-en-tooltip' " + (get_cookie("views-spreadsheet-en-tooltip") === "true" ? "checked" : "") + ">"
 				).append("<br/>"
 				).append("<input id='views-spreadsheet-settings-save' type='submit' value='Save Settings'>"
 				).append("<br/>"
@@ -324,9 +439,12 @@ jQuery(document).ready(function ($) {
 				var selected_bg_color = $("#views-spreadsheet-bg-color").val();
 				var selected_font_color = $("#views-spreadsheet-font-color").val();
 				var selected_ctrl = $("#views-spreadsheet-en-ctrl").is(":checked");
+				var selected_tooltip = $("#views-spreadsheet-en-tooltip").is(":checked");
+				var selected_border_color_a = $("#views-spreadsheet-bordera-color").val();
+				var selected_border_color_s = $("#views-spreadsheet-borders-color").val();
 				var save_status = "";
 
-				var saved = views_spreadsheet_save_settings(selected_bg_color, selected_font_color, selected_ctrl);
+				var saved = views_spreadsheet_save_settings(selected_bg_color, selected_font_color, selected_ctrl, selected_tooltip, selected_border_color_a, selected_border_color_s);
 
 				/* Change save status based on return value of save. */
 				if (saved === 1) {
@@ -359,7 +477,7 @@ jQuery(document).ready(function ($) {
 							$("#views-spreadsheet-save-message").remove();
 						});
 					}, 2000);
-				})
+				});
 
 				views_spreadsheet_sum_container.css({
 					"background"           :     get_cookie("views-spreadsheet-bg-color") ? get_cookie("views-spreadsheet-bg-color") : "#FFFFFF",
@@ -369,7 +487,110 @@ jQuery(document).ready(function ($) {
 				    "MsTransition"         :     "background 0.4s, color 0.4s ease-in-out",
 				    "OTransition"          :     "background 0.4s, color 0.4s ease-in-out",
 				    "transition"           :     "background 0.4s, color 0.4s ease-in-out",
-				}, 400);
+				});
+
+				tooltip.css({
+					"background"           :     get_cookie("views-spreadsheet-bg-color") ? get_cookie("views-spreadsheet-bg-color") : "#FFFFFF",
+					"WebkitTransition"     :     "background 0.4s ease-in-out",
+				    "MozTransition"        :     "background 0.4s ease-in-out",
+				    "MsTransition"         :     "background 0.4s ease-in-out",
+				    "OTransition"          :     "background 0.4s ease-in-out",
+				    "transition"           :     "background 0.4s ease-in-out",
+				});
+
+				tooltip_text.css({
+					"color"				   :     get_cookie("views-spreadsheet-font-color") ? get_cookie("views-spreadsheet-font-color") : "#000000",
+					"WebkitTransition"     :     "color 0.4s ease-in-out",
+				    "MozTransition"        :     "color 0.4s ease-in-out",
+				    "MsTransition"         :     "color 0.4s ease-in-out",
+				    "OTransition"          :     "color 0.4s ease-in-out",
+				    "transition"           :     "color 0.4s ease-in-out",
+				});
+
+				$(".views-spreadsheet-selected-cell-add").css({
+					"-webkit-box-shadow"     :     "inset 0px 0px 0px 3px " + selected_border_color_a,
+					"-moz-box-shadow"        :     "inset 0px 0px 0px 3px " + selected_border_color_a,
+					"box-shadow"             :     "inset 0px 0px 0px 3px " + selected_border_color_a,
+				});
+				
+				$(".views-spreadsheet-selected-cell-subtract").css({
+					"-webkit-box-shadow"     :     "inset 0px 0px 0px 3px " + selected_border_color_s,
+					"-moz-box-shadow"        :     "inset 0px 0px 0px 3px " + selected_border_color_s,
+					"box-shadow"             :     "inset 0px 0px 0px 3px " + selected_border_color_s,
+				});
+
+				if (selected_op === "+") {
+					views_spreadsheet_sum_container.css({
+						"border-color"         :     get_cookie("views-spreadsheet-bordera-color") ? get_cookie("views-spreadsheet-bordera-color") : "#669933",
+						"WebkitTransition"     :     "border-color 0.4s, color 0.4s ease-in-out",
+					    "MozTransition"        :     "border-color 0.4s, color 0.4s ease-in-out",
+					    "MsTransition"         :     "border-color 0.4s, color 0.4s ease-in-out",
+					    "OTransition"          :     "border-color 0.4s, color 0.4s ease-in-out",
+					    "transition"           :     "border-color 0.4s, color 0.4s ease-in-out",
+					});
+					$(".views-spreadsheet-right-rule").css({
+						"border-color"         :     get_cookie("views-spreadsheet-bordera-color") ? get_cookie("views-spreadsheet-bordera-color") : "#669933",
+						"WebkitTransition"     :     "border-color 0.4s ease-in-out",
+						"MozTransition"        :     "border-color 0.4s ease-in-out",
+						"MsTransition"         :     "border-color 0.4s ease-in-out",
+						"OTransition"          :     "border-color 0.4s ease-in-out",
+						"transition"           :     "border-color 0.4s ease-in-out",
+					});
+
+					$(".views-spreadsheet-rule").css({
+						"background"           :     get_cookie("views-spreadsheet-bordera-color") ? get_cookie("views-spreadsheet-bordera-color") : "#669933",
+						"WebkitTransition"     :     "background 0.4s ease-in-out",
+						"MozTransition"        :     "background 0.4s ease-in-out",
+						"MsTransition"         :     "background 0.4s ease-in-out",
+						"OTransition"          :     "background 0.4s ease-in-out",
+						"transition"           :     "background 0.4s ease-in-out",
+					});
+
+					tooltip.css({
+						"border-color"         :     get_cookie("views-spreadsheet-bordera-color") ? get_cookie("views-spreadsheet-bordera-color") : "#669933",
+						"WebkitTransition"     :     "border-color 0.4s ease-in-out",
+					    "MozTransition"        :     "border-color 0.4s ease-in-out",
+					    "MsTransition"         :     "border-color 0.4s ease-in-out",
+					    "OTransition"          :     "border-color 0.4s ease-in-out",
+					    "transition"           :     "border-color 0.4s ease-in-out",
+					});
+				}
+				else if (selected_op === "-") {
+					views_spreadsheet_sum_container.css({
+						"border-color"         :     get_cookie("views-spreadsheet-borders-color") ? get_cookie("views-spreadsheet-borders-color") : "#FF9900",
+						"WebkitTransition"     :     "border-color 0.4s, color 0.4s ease-in-out",
+					    "MozTransition"        :     "border-color 0.4s, color 0.4s ease-in-out",
+					    "MsTransition"         :     "border-color 0.4s, color 0.4s ease-in-out",
+					    "OTransition"          :     "border-color 0.4s, color 0.4s ease-in-out",
+					    "transition"           :     "border-color 0.4s, color 0.4s ease-in-out",
+					});
+					$(".views-spreadsheet-right-rule").css({
+						"border-color"         :     get_cookie("views-spreadsheet-borders-color") ? get_cookie("views-spreadsheet-borders-color") : "#FF9900",
+						"WebkitTransition"     :     "border-color 0.4s ease-in-out",
+						"MozTransition"        :     "border-color 0.4s ease-in-out",
+						"MsTransition"         :     "border-color 0.4s ease-in-out",
+						"OTransition"          :     "border-color 0.4s ease-in-out",
+						"transition"           :     "border-color 0.4s ease-in-out",
+					});
+
+					$(".views-spreadsheet-rule").css({
+						"background"           :     get_cookie("views-spreadsheet-borders-color") ? get_cookie("views-spreadsheet-borders-color") : "#FF9900",
+						"WebkitTransition"     :     "background 0.4s ease-in-out",
+						"MozTransition"        :     "background 0.4s ease-in-out",
+						"MsTransition"         :     "background 0.4s ease-in-out",
+						"OTransition"          :     "background 0.4s ease-in-out",
+						"transition"           :     "background 0.4s ease-in-out",
+					});
+
+					tooltip.css({
+						"border-color"         :     get_cookie("views-spreadsheet-borders-color") ? get_cookie("views-spreadsheet-borders-color") : "#FF9900",
+						"WebkitTransition"     :     "border-color 0.4s ease-in-out",
+					    "MozTransition"        :     "border-color 0.4s ease-in-out",
+					    "MsTransition"         :     "border-color 0.4s ease-in-out",
+					    "OTransition"          :     "border-color 0.4s ease-in-out",
+					    "transition"           :     "border-color 0.4s ease-in-out",
+					});
+				}
 			});
 
 			$("#views-spreadsheet-background-option").css({
@@ -439,7 +660,7 @@ jQuery(document).ready(function ($) {
 					/* If selection is the same. */
 					if (first_row === selected_row && first_column === selected_column) {
 						if (views_spreadsheet_select_cell (first_cell, selected_list, selected_op)) {
-							sum = views_spreadsheet_operation(selected_op, next_cell_value, sum);
+							sum = views_spreadsheet_operation(selected_op, cell_value, sum);
 						}
 					}
 					/* Traverse direction depending on the first and currently selected cells. */
@@ -449,7 +670,7 @@ jQuery(document).ready(function ($) {
 								for (i = first_column; i <= selected_column; i++) {
 									for (j = first_row; j <= selected_row; j++) {
 										var next_cell = table.rows[j + 1].cells[i];
-										var next_cell_value = parseFloat($(next_cell).text().trim().replace("$", ""))
+										var next_cell_value = parseFloat($(next_cell).text().trim().replace("$", ""));
 
 										if (views_spreadsheet_select_cell (next_cell, selected_list, selected_op)) {
 											sum = views_spreadsheet_operation(selected_op, next_cell_value, sum);
@@ -461,7 +682,7 @@ jQuery(document).ready(function ($) {
 								for (i = first_column; i <= selected_column; i++) {
 									for (j = first_row; j >= selected_row; j--) {
 										var next_cell = table.rows[j + 1].cells[i];
-										var next_cell_value = parseFloat($(next_cell).text().trim().replace("$", ""))
+										var next_cell_value = parseFloat($(next_cell).text().trim().replace("$", ""));
 
 										if (views_spreadsheet_select_cell (next_cell, selected_list, selected_op)) {
 											sum = views_spreadsheet_operation(selected_op, next_cell_value, sum);
@@ -475,7 +696,7 @@ jQuery(document).ready(function ($) {
 								for (i = first_column; i >= selected_column; i--) {
 									for (j = first_row; j <= selected_row; j++) {
 										var next_cell = table.rows[j + 1].cells[i];
-										var next_cell_value = parseFloat($(next_cell).text().trim().replace("$", ""))
+										var next_cell_value = parseFloat($(next_cell).text().trim().replace("$", ""));
 
 										if (views_spreadsheet_select_cell (next_cell, selected_list, selected_op)) {
 											sum = views_spreadsheet_operation(selected_op, next_cell_value, sum);
@@ -487,7 +708,7 @@ jQuery(document).ready(function ($) {
 								for (i = first_column; i >= selected_column; i--) {
 									for (j = first_row; j >= selected_row; j--) {
 										var next_cell = table.rows[j + 1].cells[i];
-										var next_cell_value = parseFloat($(next_cell).text().trim().replace("$", ""))
+										var next_cell_value = parseFloat($(next_cell).text().trim().replace("$", ""));
 
 										if (views_spreadsheet_select_cell (next_cell, selected_list, selected_op)) {
 											sum = views_spreadsheet_operation(selected_op, next_cell_value, sum);
@@ -529,7 +750,12 @@ jQuery(document).ready(function ($) {
 			sum = views_spreadsheet_operation(selected_op, cell_value, 0);
 
 			views_spreadsheet_highlight($(selected_cell), selected_op);
-			$(selected_cell).addClass("views-spreadsheet-selected-cell");
+
+			if (selected_op === "+")
+				$(selected_cell).addClass("views-spreadsheet-selected-cell-add");
+			else if (selected_op === "-") {
+				$(selected_cell).addClass("views-spreadsheet-selected-cell-subtract");
+			}
 		}
 
 		/* Hide or show the sum container based on how many values are selected. */
@@ -537,12 +763,16 @@ jQuery(document).ready(function ($) {
 			views_spreadsheet_sum_container.stop(true, true).animate({
 				"opacity"     :     "0.0",
 			}, 400, function () {
-				$(this).css({"visibility" : "hidden"});
+				$(this).css({
+					"display"       :    "none",
+					"visibility"    :    "hidden",
+				});
 			});
 		}
 		else {
 			views_spreadsheet_sum_container.css({
-				"visibility"  :     "visible",
+				"display"        :     "block",
+				"visibility"     :     "visible",
 			}).stop(true, true).animate({
 				"opacity"     :     "1.0",
 			}, 400);
@@ -551,6 +781,13 @@ jQuery(document).ready(function ($) {
 		/* Change the sum and cell count values. */
 		$("#views-spreadsheet-num-cells").text(selected_list.length);
 		$("#views-spreadsheet-sum-display").text(sum.toFixed(2));
+
+		if (("" + selected_list.length).length > 12) {
+			$("#views-spreadsheet-num-cells").text("Too many!");
+		}
+		if (sum.toFixed(2).length > 14) {
+			$("#views-spreadsheet-sum-display").text("Too many digits!");
+		}
 	}); /* End of cell click functions. */
 
 	/**
@@ -687,20 +924,22 @@ jQuery(document).ready(function ($) {
 	 *   A string containing the cell's add or subtract operation.
 	 */
 	function views_spreadsheet_highlight (cell, op) {
-		if (op === "+") {
-			cell.css({
-				"-webkit-box-shadow"     :     "inset 0px 0px 0px 3px green",
-				"-moz-box-shadow"        :     "inset 0px 0px 0px 3px green",
-				"box-shadow"             :     "inset 0px 0px 0px 3px green",
-			});
+		var color = "";
+
+		switch (op) {
+			case "+":
+				color = get_cookie("views-spreadsheet-bordera-color") ? get_cookie("views-spreadsheet-bordera-color") : "#669933";
+				break;
+			case "-":
+				color = get_cookie("views-spreadsheet-borders-color") ? get_cookie("views-spreadsheet-borders-color") : "#FF9900";
+				break;
 		}
-		else {
-			cell.css({
-				"-webkit-box-shadow"     :     "inset 0px 0px 0px 3px orange",
-				"-moz-box-shadow"        :     "inset 0px 0px 0px 3px orange",
-				"box-shadow"             :     "inset 0px 0px 0px 3px orange",
-			});
-		}
+
+		cell.css({
+			"-webkit-box-shadow"     :     "inset 0px 0px 0px 3px " + color,
+			"-moz-box-shadow"        :     "inset 0px 0px 0px 3px " + color,
+			"box-shadow"             :     "inset 0px 0px 0px 3px " + color,
+		});
 	}
 
     /**
@@ -756,7 +995,8 @@ jQuery(document).ready(function ($) {
 		}
 		else {
 			views_spreadsheet_remove_highlight($(cell));
-			$(cell).removeClass("views-spreadsheet-selected-cell");
+			$(cell).removeClass("views-spreadsheet-selected-cell-add");
+			$(cell).removeClass("views-spreadsheet-selected-cell-subtract");
 
 			array.splice(deselect_index, 1);
 
@@ -773,7 +1013,8 @@ jQuery(document).ready(function ($) {
      */
 	function views_spreadsheet_deselect_list (array) {
 		for (i = 0; i < array.length; i++) {
-			$(array[i].cell).removeClass("views-spreadsheet-selected-cell");
+			$(array[i].cell).removeClass("views-spreadsheet-selected-cell-add");
+			$(array[i].cell).removeClass("views-spreadsheet-selected-cell-subtract");
 			views_spreadsheet_remove_highlight($(array[i].cell));
 		}
 
@@ -798,7 +1039,13 @@ jQuery(document).ready(function ($) {
 			array.push({"cell":cell, "op":op});
 
 			views_spreadsheet_highlight($(cell), op);
-			$(cell).addClass("views-spreadsheet-selected-cell");
+
+			if (op === "+") {
+				$(cell).addClass("views-spreadsheet-selected-cell-add");
+			}
+			else if (op === "-") {
+				$(cell).addClass("views-spreadsheet-selected-cell-subtract");
+			}
 
 			return true;
 		}
@@ -818,69 +1065,81 @@ jQuery(document).ready(function ($) {
 	 * @return {Number}
 	 *   1 if successful, returns an error code otherwise.
 	 */
-	function views_spreadsheet_save_settings (background_color, font_color, enable_ctrl) {
-		if (!is_valid_color(background_color) || !is_valid_color(font_color)) {
+	function views_spreadsheet_save_settings (background_color, font_color, enable_ctrl, enable_tooltip, add_color, sub_color) {
+		if (!is_valid_color(background_color) || !is_valid_color(font_color) || !is_valid_color(add_color) || !is_valid_color(sub_color)) {
 			return -1;
 		}
 		else {
 			document.cookie = "views-spreadsheet-bg-color=" + background_color;
 			document.cookie = "views-spreadsheet-font-color=" + font_color;
 			document.cookie = "views-spreadsheet-en-ctrl=" + enable_ctrl;
+			document.cookie = "views-spreadsheet-en-tooltip=" + enable_tooltip;
+			document.cookie = "views-spreadsheet-bordera-color=" + add_color;
+			document.cookie = "views-spreadsheet-borders-color=" + sub_color;
 
 			return 1;
 		}
 	}
+
+	/**
+	 * Checks if a value is numeric.
+	 * @param value
+	 *   The value to be checked.
+	 * @return {Boolean}
+	 *   True if numeric, false if not numeric.
+	 */
+	function is_numeric(value) {
+		return !isNaN(value);
+	}
+
+	/**
+	 * Checks if a value is a valid HEX color.
+	 * @param value
+	 *   The value to be checked.
+	 * @return {Boolean}
+	 *   True if valid, false if not valid.
+	 */
+	function is_valid_color(value) {
+		var valid = /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(value);
+
+		return valid;
+	}
+
+	/**
+	 * Deletes a cookie based on a given key.
+	 * @param key
+	 *   The key to look for.
+	 */
+	function delete_cookie(key) {
+		document.cookie = key + '=; expires=Thu, 01-Jan-70 00:00:01 GMT;';
+	}
+
+	/**
+	 * Gets a cookie based on a given key.
+	 * @param key
+	 *   The key to look for.
+	 * @return {*}
+	 *   The value of the cookie.
+	 */
+	function get_cookie(name) {
+	  	/*var cookies = document.cookie.split("; ");
+	  	var key_value = new Array();
+
+	  	for (i = 0; i < cookies.length; i++) {
+	  		key_value = cookies[i].split("=");
+
+	  		if (key_value[0] === key) {
+	  			//return unescape(key_value[1]);
+	  			return key_value[1];
+	  		}
+	  	}*/
+	  	var nameEQ = name + "=";
+	    var ca = document.cookie.split(';');
+	    for (var i = 0; i < ca.length; i++) {
+	        var c = ca[i];
+	        while (c.charAt(0)==' ') c = c.substring(1,c.length);
+	        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+	    }
+	    return null;
+	}
 });
-
-/**
- * Checks if a value is numeric.
- * @param value
- *   The value to be checked.
- * @return {Boolean}
- *   True if numeric, false if not numeric.
- */
-function is_numeric(value) {
-	return !isNaN(value);
-}
-
-/**
- * Checks if a value is a valid HEX color.
- * @param value
- *   The value to be checked.
- * @return {Boolean}
- *   True if valid, false if not valid.
- */
-function is_valid_color(value) {
-	var valid = /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(value);
-
-	return valid;
-}
-
-/**
- * Gets a cookie based on a given key.
- * @param key
- *   The key to look for.
- * @return {*}
- *   The value of the cookie.
- */
-function get_cookie(key) {
-  	var cookies = document.cookie.split("; ");
-  	var key_value = new Array();
-
-  	for (i = 0; i < cookies.length; i++) {
-  		key_value = cookies[i].split("=");
-
-  		if (key_value[0] === key) {
-  			return unescape(key_value[1]);
-  		}
-  	}
-}
-
-/**
- * Deletes a cookie based on a given key.
- * @param key
- *   The key to look for.
- */
-function delete_cookie(key) {
-	document.cookie = key + '=; expires=Thu, 01-Jan-70 00:00:01 GMT;';
-}
