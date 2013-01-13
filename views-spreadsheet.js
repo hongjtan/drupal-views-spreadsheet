@@ -523,30 +523,6 @@ jQuery(document).ready(function ($) {
 	}
 
     /**
-     * Highlights a cell based on the operation given.
-     * @param cell
-     *   A string containing an HTML/JavaScript TD DOM element.
-     * @param op
-     *   A string containing the cell's add or subtract operation.
-     */
-	function views_spreadsheet_highlight (cell, op) {
-		if (op === "+") {
-			cell.css({
-				"-webkit-box-shadow"     :     "inset 0px 0px 0px 3px green",
-				"-moz-box-shadow"        :     "inset 0px 0px 0px 3px green",
-				"box-shadow"             :     "inset 0px 0px 0px 3px green",
-			});
-		}
-		else {
-			cell.css({
-				"-webkit-box-shadow"     :     "inset 0px 0px 0px 3px orange",
-				"-moz-box-shadow"        :     "inset 0px 0px 0px 3px orange",
-				"box-shadow"             :     "inset 0px 0px 0px 3px orange",
-			});
-		}
-	}
-
-    /**
      * Check if a given table cell exists in a given array.
      * @param cell
      *   A string containing an HTML/JavaScript TD DOM element.
@@ -615,6 +591,30 @@ jQuery(document).ready(function ($) {
 
 		return sum;
 	}
+	
+	/**
+	 * Highlights a cell based on the operation given.
+	 * @param cell
+	 *   A string containing an HTML/JavaScript TD DOM element.
+	 * @param op
+	 *   A string containing the cell's add or subtract operation.
+	 */
+	function views_spreadsheet_highlight (cell, op) {
+		if (op === "+") {
+			cell.css({
+				"-webkit-box-shadow"     :     "inset 0px 0px 0px 3px green",
+				"-moz-box-shadow"        :     "inset 0px 0px 0px 3px green",
+				"box-shadow"             :     "inset 0px 0px 0px 3px green",
+			});
+		}
+		else {
+			cell.css({
+				"-webkit-box-shadow"     :     "inset 0px 0px 0px 3px orange",
+				"-moz-box-shadow"        :     "inset 0px 0px 0px 3px orange",
+				"box-shadow"             :     "inset 0px 0px 0px 3px orange",
+			});
+		}
+	}
 
     /**
      * Removes the inset border on a given cell.
@@ -644,31 +644,6 @@ jQuery(document).ready(function ($) {
 		var cell = table.find("tbody")[0].rows[row].cells[column];
 
 		return cell;
-	}
-
-    /**
-     * Pushes the cell and op into the given array, highlights the cell, and gives it a class.
-     * @param cell
-     *   The HTML/Javascript DOM TD element to be selected.
-     * @param array
-     *   An array containing objects with array.cell and array.op strings.
-     * @param op
-     *   The operation to be performed on the element ("+" or "-").
-     * @return {Boolean}
-     *   True on success, false on failure.
-     */
-	function views_spreadsheet_select_cell (cell, array, op) {
-		if(is_valid_cell(cell, array)) {
-			array.push({"cell":cell, "op":op});
-
-			views_spreadsheet_highlight($(cell), op);
-			$(cell).addClass("views-spreadsheet-selected-cell");
-
-			return true;
-		}
-		else {
-			return false;
-		}
 	}
 
     /**
@@ -719,6 +694,55 @@ jQuery(document).ready(function ($) {
 
 		return array;
 	}
+
+	/**
+	 * Pushes the cell and op into the given array, highlights the cell, and gives it a class.
+	 * @param cell
+	 *   The HTML/Javascript DOM TD element to be selected.
+	 * @param array
+	 *   An array containing objects with array.cell and array.op strings.
+	 * @param op
+	 *   The operation to be performed on the element ("+" or "-").
+	 * @return {Boolean}
+	 *   True on success, false on failure.
+	 */
+	function views_spreadsheet_select_cell (cell, array, op) {
+		if(is_valid_cell(cell, array)) {
+			array.push({"cell":cell, "op":op});
+
+			views_spreadsheet_highlight($(cell), op);
+			$(cell).addClass("views-spreadsheet-selected-cell");
+
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	/**
+	 * Save settings.
+	 * @param background_color
+	 *   A background color in HEX format.
+	 * @param font_color
+	 *   A font color in HEX format.
+	 * @param enable_ctrl
+	 *   True or false whether or not the CTRL modifier key is enabled.
+	 * @return {Number}
+	 *   1 if successful, returns an error code otherwise.
+	 */
+	function views_spreadsheet_save_settings (background_color, font_color, enable_ctrl) {
+		if (!is_valid_color(background_color) || !is_valid_color(font_color)) {
+			return -1;
+		}
+		else {
+			document.cookie = "views-spreadsheet-bg-color=" + background_color;
+			document.cookie = "views-spreadsheet-font-color=" + font_color;
+			document.cookie = "views-spreadsheet-en-ctrl=" + enable_ctrl;
+
+			return 1;
+		}
+	}
 });
 
 /**
@@ -743,30 +767,6 @@ function is_valid_color(value) {
 	var valid = /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(value);
 
 	return valid;
-}
-
-/**
- * Save settings.
- * @param background_color
- *   A background color in HEX format.
- * @param font_color
- *   A font color in HEX format.
- * @param enable_ctrl
- *   True or false whether or not the CTRL modifier key is enabled.
- * @return {Number}
- *   1 if successful, returns an error code otherwise.
- */
-function views_spreadsheet_save_settings (background_color, font_color, enable_ctrl) {
-	if (!is_valid_color(background_color) || !is_valid_color(font_color)) {
-		return -1;
-	}
-	else {
-		document.cookie = "views-spreadsheet-bg-color=" + background_color;
-		document.cookie = "views-spreadsheet-font-color=" + font_color;
-		document.cookie = "views-spreadsheet-en-ctrl=" + enable_ctrl;
-
-		return 1;
-	}
 }
 
 /**
