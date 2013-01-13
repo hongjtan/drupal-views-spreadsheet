@@ -58,12 +58,33 @@ jQuery(document).ready(function ($) {
 		$(this).fadeTo(300, 1.0);
 	});*/
 
-	views_spreadsheet_sum_container.append("<p id='views-spreadsheet-number-selected'>Cells Selected: " + selected_list.length + "</p>"
-		).append("<p id='views-spreadsheet-sum'> Total Sum: " + sum.toFixed(2) + "</p>");
+	views_spreadsheet_sum_container.append(
+			"<span id='views-spreadsheet-number-selected' class='views-spreadsheet-num-cells views-spreadsheet-left'>Cells: </span>"
+			+ "<span id='views-spreadsheet-num-cells' class='views-spreadsheet-num-cells views-spreadsheet-right'>"
+			+ selected_list.length
+			+ "</span>"
+		).append("<br/><br/>"
+		).append(
+			"<span id='views-spreadsheet-sum' class='views-spreadsheet-sum views-spreadsheet-left'>Sum: </span>"
+			+ "<span id='views-spreadsheet-sum-display' class='views-spreadsheet-sum views-spreadsheet-right'>"
+			+ sum.toFixed(2)
+			+ "</span>");
 
+	$(".views-spreadsheet-left").css({
+		"float"           :     "left",
+		"margin-left"     :     "5px",
+	});
+	$(".views-spreadsheet-right").css({
+		"float"            :     "right",
+		"margin-right"     :     "35px",
+	});
 
-	$("#views-spreadsheet-sum-container p").css({
-		"line-height"   :     "11px",
+	$(".views-spreadsheet-num-cells").css({
+		"margin-top"     :     "20px"
+	});
+
+	$("#views-spreadsheet-sum-container span").css({
+		//"line-height"   :     "18px",
 		"text-align"    :     "center",
 		"font-size"     :     "15px",
 		"font-weight"   :     "bold",
@@ -71,13 +92,32 @@ jQuery(document).ready(function ($) {
 		"font-family"   :     "Helvetica",
 	});
 
-	views_spreadsheet_sum_container.append("<div class='views-spreadsheet-button' id='views-spreadsheet-add-op'>+</div>"
+	views_spreadsheet_sum_container.append("<hr class='views-spreadsheet-bot-rule'/>"
+		).append("<div class='views-spreadsheet-right-rule'></div>"
+		).append("<div class='views-spreadsheet-button' id='views-spreadsheet-add-op'>+</div>"
 		).append("<div class='views-spreadsheet-button' id='views-spreadsheet-subtract-op'>-</div>"
 		).append("<div class='views-spreadsheet-button' id='views-spreadsheet-clear-button')>C</div>"
 		).append("<div class='views-spreadsheet-button' id='views-spreadsheet-settings-button'>S</div>"
 		);
 
+	$(".views-spreadsheet-right-rule").css({
+		"position"        :     "absolute",
+		"height"          :     "100%",
+		"width"           :     "1px",
+		"right"           :     "23px",
+		"top"             :     "0px",
+		"border-left"     :     "1px solid green",
+	});
+
+	$(".views-spreadsheet-bot-rule").css({
+		"position"       :     "absolute",
+		"bottom"         :     "23px",
+		"width"          :     "100%",
+		"background"     :     "green",
+	});
+
 	$(".views-spreadsheet-button").css({
+		"position"         :     "absolute",
 		"display"          :     "inline-block",
 		"font-size"        :     "14px",
 		"cursor"           :     "pointer",
@@ -86,9 +126,37 @@ jQuery(document).ready(function ($) {
 		"font-weight"      :     "bold",
 	});
 
+	$("#views-spreadsheet-add-op").css({
+		"bottom"     :     "2px",
+		"left"       :     "2px",
+	});
+
+	$("#views-spreadsheet-subtract-op").css({
+		"bottom"     :     "2px",
+		"left"       :     "20px",
+	});
+
 	// Change operators when addition or subtraction is chosen.
 	$("#views-spreadsheet-add-op").click(function (event) {
 		selected_op = "+";
+
+		$(".views-spreadsheet-right-rule").css({
+			"border-color"         :     "green",
+			"WebkitTransition"     :     "border-color 0.4s ease-in-out",
+			"MozTransition"        :     "border-color 0.4s ease-in-out",
+			"MsTransition"         :     "border-color 0.4s ease-in-out",
+			"OTransition"          :     "border-color 0.4s ease-in-out",
+			"transition"           :     "border-color 0.4s ease-in-out",
+		});
+
+		$(".views-spreadsheet-bot-rule").css({
+			"background"           :     "green",
+			"WebkitTransition"     :     "background 0.4s ease-in-out",
+			"MozTransition"        :     "background 0.4s ease-in-out",
+			"MsTransition"         :     "background 0.4s ease-in-out",
+			"OTransition"          :     "background 0.4s ease-in-out",
+			"transition"           :     "background 0.4s ease-in-out",
+		});
 
 		views_spreadsheet_sum_container.css({
 			"border-color"         :     "green",
@@ -102,6 +170,24 @@ jQuery(document).ready(function ($) {
 	$("#views-spreadsheet-subtract-op").click(function (event) {
 		selected_op = "-";
 
+		$(".views-spreadsheet-right-rule").css({
+			"border-color"         :     "orange",
+			"WebkitTransition"     :     "border-color 0.4s ease-in-out",
+			"MozTransition"        :     "border-color 0.4s ease-in-out",
+			"MsTransition"         :     "border-color 0.4s ease-in-out",
+			"OTransition"          :     "border-color 0.4s ease-in-out",
+			"transition"           :     "border-color 0.4s ease-in-out",
+		});
+
+		$(".views-spreadsheet-bot-rule").css({
+			"background"           :     "orange",
+			"WebkitTransition"     :     "background 0.4s ease-in-out",
+			"MozTransition"        :     "background 0.4s ease-in-out",
+			"MsTransition"         :     "background 0.4s ease-in-out",
+			"OTransition"          :     "background 0.4s ease-in-out",
+			"transition"           :     "background 0.4s ease-in-out",
+		});
+
 		views_spreadsheet_sum_container.css({
 			"border-color"         :     "orange",
 			"WebkitTransition"     :     "border-color 0.4s ease-in-out",
@@ -113,12 +199,13 @@ jQuery(document).ready(function ($) {
 	});
 
 	$("#views-spreadsheet-clear-button").css({
-		"float"		:     "right",
+		"right"      :     "2px",
+		"bottom"     :     "2px",
 	});
 
 	$("#views-spreadsheet-settings-button").css({
-		"top"		   :     "0px", 
-		"right"        :     "0px",
+		"top"		   :     "2px",
+		"right"        :     "2px",
 		"position"     :     "absolute",
 		"float"        :     "right",
 	});
@@ -462,8 +549,8 @@ jQuery(document).ready(function ($) {
 		}
 
 		/* Change the sum and cell count values. */
-		$("#views-spreadsheet-number-selected").text("Cells Selected: " + selected_list.length);
-		$("#views-spreadsheet-sum").text("Total Sum: " + sum.toFixed(2));
+		$("#views-spreadsheet-num-cells").text(selected_list.length);
+		$("#views-spreadsheet-sum-display").text(sum.toFixed(2));
 	}); /* End of cell click functions. */
 
 	/**
@@ -591,7 +678,7 @@ jQuery(document).ready(function ($) {
 
 		return sum;
 	}
-	
+
 	/**
 	 * Highlights a cell based on the operation given.
 	 * @param cell
