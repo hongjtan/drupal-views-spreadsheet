@@ -1,23 +1,23 @@
 /*!
- *  @brief 		Allows the user to select table cells in a Drupal view and sums or subtracts the values in the selected cells.
- *	@author 	Hong Jie Tan <hongjtan@gmail.com>
- *	@version 	0.2
- *	@date		January 2013
+ * @brief 		Allows the user to select table cells in a Drupal view and sums or subtracts the values in the selected cells.
+ * @author 	    Hong Jie Tan <hongjtan@gmail.com>
+ * @version 	0.2
+ * @date		January 2013
  *
- *  @section LICENSE
+ * @section     LICENSE
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *   This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ *  This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 jQuery(document).ready(function ($) {
@@ -320,7 +320,7 @@ jQuery(document).ready(function ($) {
 	});
 	/* End of building user interface and settings. */
 
-	// Cell click functions.
+	/* Cell click functions. */
 	$(".views-field").click(function (event) {
 		var selected_row = $(this).parent().parent().children().index(this.parentNode);
 		var selected_column = $(this).parent().children().index(this);
@@ -343,7 +343,7 @@ jQuery(document).ready(function ($) {
 					var previous_row = previous_cell.parent().parent().children().index(previous_cell[0].parentNode);
 					var previous_column = previous_cell.parent().children().index(previous_cell[0]);
 
-					views_spreadsheet_deselect_list (selected_list);
+					selected_list = views_spreadsheet_deselect_list (selected_list);
 					sum = 0;
 
 					/* Clear text selection. */
@@ -423,7 +423,6 @@ jQuery(document).ready(function ($) {
 				var cell_op = selected_list[cell_index].op;
 
 				if (views_spreadsheet_deselect_cell (selected_cell, selected_list) != -1) {
-
 					sum = views_spreadsheet_operation(reverse_op(cell_op), cell_value, sum);
 				}
 			}
@@ -465,7 +464,7 @@ jQuery(document).ready(function ($) {
 		/* Change the sum and cell count values. */
 		$("#views-spreadsheet-number-selected").text("Cells Selected: " + selected_list.length);
 		$("#views-spreadsheet-sum").text("Total Sum: " + sum.toFixed(2));
-	});
+	}); /* End of cell click functions. */
 
 	/**
 	 * Deselects user selected text in the browser window.
@@ -486,11 +485,9 @@ jQuery(document).ready(function ($) {
 
 	/**
 	 * Returns the reverse of the operation passed in.
-	 *
-	 * @param string op
+	 * @param op
 	 *   A string containing "+" or "-".
-	 *
-	 * @return string
+	 * @return {string}
 	 *   A string containing the reverse of "+" or "-".
 	 */
 	function reverse_op (op) {
@@ -509,12 +506,10 @@ jQuery(document).ready(function ($) {
 
 	/**
 	 * Checks whether or not a cell is a valid cell to be selected.
-	 *
-	 * @param string cell
-	 *   A string containing a HTML/JavaScript TD DOM element.
-	 *
-	 * @param array array
-	 *   An array containing 
+	 * @param cell
+	 *   A string containing an HTML/JavaScript TD DOM element.
+	 * @param array
+	 *   An array containing objects with array.cell and array.op strings.
 	 */
 	function is_valid_cell (cell, array) {
 		var cell_data = $(cell).text().trim().replace("$", "");
@@ -527,7 +522,13 @@ jQuery(document).ready(function ($) {
 		}
 	}
 
-	/* This function takes a cell and highlights it with an inset shadow. */
+    /**
+     * Highlights a cell based on the operation given.
+     * @param cell
+     *   A string containing an HTML/JavaScript TD DOM element.
+     * @param op
+     *   A string containing the cell's add or subtract operation.
+     */
 	function views_spreadsheet_highlight (cell, op) {
 		if (op === "+") {
 			cell.css({
@@ -545,7 +546,15 @@ jQuery(document).ready(function ($) {
 		}
 	}
 
-	/* Check to see if the cell exists in a list of cells. */
+    /**
+     * Check if a given table cell exists in a given array.
+     * @param cell
+     *   A string containing an HTML/JavaScript TD DOM element.
+     * @param array
+     *   An array containing objects with array.cell and array.op strings.
+     * @return {Boolean}
+     *   False if not in array, true if it was found.
+     */
 	function views_spreadsheet_cell_exists (cell, array) {
 		var found_in_array = jQuery.grep(array, function(array_element, i) {
 			return array_element.cell == cell;
@@ -559,7 +568,15 @@ jQuery(document).ready(function ($) {
 		}
 	}
 
-	/* Get the index of a cell in an array. */
+    /**
+     * Finds the index of a given cell in a given array.
+     * @param cell
+     *   A string containing an HTML/JavaScript TD DOM element.
+     * @param array
+     *   An array containing objects with array.cell and array.op strings.
+     * @return {Number}
+     *   Returns the position of the cell in the array.
+     */
 	function views_spreadsheet_cell_index (cell, array) {
 		var cell_index = -1;
 
@@ -573,7 +590,17 @@ jQuery(document).ready(function ($) {
 		return cell_index;
 	}
 
-	/* This function either adds or subtracts values based on what is selected. */
+    /**
+     * Performs an add or subtract operation depending on the given operation.
+     * @param op
+     *   A string containing "+" or "-" to be performed.
+     * @param value
+     *   The value to add or subtract.
+     * @param sum
+     *   The current sum.
+     * @return {*}
+     *   The new sum.
+     */
 	function views_spreadsheet_operation (op, value, sum) {
 		switch (op) {
 			case "+":
@@ -589,7 +616,11 @@ jQuery(document).ready(function ($) {
 		return sum;
 	}
 
-	/* This function takes a cell and removes the highlight from the cell. */
+    /**
+     * Removes the inset border on a given cell.
+     * @param cell
+     *   The cell to have its border removed.
+     */
 	function views_spreadsheet_remove_highlight (cell) {
 		cell.css({
 			"-webkit-box-shadow"     :     "none",
@@ -598,14 +629,34 @@ jQuery(document).ready(function ($) {
 		});
 	}
 
-	/* Gets a cell given the row, column number, and the table to select from. Returns a JavaScript DOM object. */
+    /**
+     * Retrieves the HTML/JavaScript DOM TD element.
+     * @param row
+     *   The row the cell is in.
+     * @param column
+     *   The column the cell is in.
+     * @param table
+     *   The jQuery table to retrieve the cell from.
+     * @return {*}
+     *   The HTML/Javascript DOM TD element.
+     */
 	function views_spreadsheet_get_cell (row, column, table) {
 		var cell = table.find("tbody")[0].rows[row].cells[column];
 
 		return cell;
 	}
 
-	/* Selects a given cell, an array to put the cell in, and the operation the cell is using. */
+    /**
+     * Pushes the cell and op into the given array, highlights the cell, and gives it a class.
+     * @param cell
+     *   The HTML/Javascript DOM TD element to be selected.
+     * @param array
+     *   An array containing objects with array.cell and array.op strings.
+     * @param op
+     *   The operation to be performed on the element ("+" or "-").
+     * @return {Boolean}
+     *   True on success, false on failure.
+     */
 	function views_spreadsheet_select_cell (cell, array, op) {
 		if(is_valid_cell(cell, array)) {
 			array.push({"cell":cell, "op":op});
@@ -620,6 +671,15 @@ jQuery(document).ready(function ($) {
 		}
 	}
 
+    /**
+     * Removes the cell from a given array along with its highlight and the added class.
+     * @param cell
+     *   The HTML/Javascript DOM TD element to be de-selected.
+     * @param array
+     *   An array containing objects with array.cell and array.op strings.
+     * @return {*}
+     *   True if successful, false if failed.
+     */
 	function views_spreadsheet_deselect_cell (cell, array) {
 		var deselect_index = -1;
 		var exists = jQuery.grep(array, function(array_element, index) {
@@ -638,11 +698,17 @@ jQuery(document).ready(function ($) {
 
 			array.splice(deselect_index, 1);
 
-			return array;
+			return true;
 		}
 	}
 
-	// Given an array of selected items, deselects them.
+    /**
+     * Given an array of array.cell and array.op objects, deselects them.
+     * @param array
+     *   An array containing objects with array.cell and array.op strings.
+     * @return {*}
+     *   Returns the empty array.
+     */
 	function views_spreadsheet_deselect_list (array) {
 		for (i = 0; i < array.length; i++) {
 			$(array[i].cell).removeClass("views-spreadsheet-selected-cell");
@@ -655,18 +721,41 @@ jQuery(document).ready(function ($) {
 	}
 });
 
-// Function that checks whether a value is numeric.
+/**
+ * Checks if a value is numeric.
+ * @param value
+ *   The value to be checked.
+ * @return {Boolean}
+ *   True if numeric, false if not numeric.
+ */
 function is_numeric(value) {
 	return !isNaN(value);
 }
 
+/**
+ * Checks if a value is a valid HEX color.
+ * @param value
+ *   The value to be checked.
+ * @return {Boolean}
+ *   True if valid, false if not valid.
+ */
 function is_valid_color(value) {
 	var valid = /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(value);
 
 	return valid;
 }
 
-/* Save settings. */
+/**
+ * Save settings.
+ * @param background_color
+ *   A background color in HEX format.
+ * @param font_color
+ *   A font color in HEX format.
+ * @param enable_ctrl
+ *   True or false whether or not the CTRL modifier key is enabled.
+ * @return {Number}
+ *   1 if successful, returns an error code otherwise.
+ */
 function views_spreadsheet_save_settings (background_color, font_color, enable_ctrl) {
 	if (!is_valid_color(background_color) || !is_valid_color(font_color)) {
 		return -1;
@@ -680,7 +769,13 @@ function views_spreadsheet_save_settings (background_color, font_color, enable_c
 	}
 }
 
-/* Function to get a cookie. */
+/**
+ * Gets a cookie based on a given key.
+ * @param key
+ *   The key to look for.
+ * @return {*}
+ *   The value of the cookie.
+ */
 function get_cookie(key) {
   	var cookies = document.cookie.split("; ");
   	var key_value = new Array();
@@ -694,7 +789,11 @@ function get_cookie(key) {
   	}
 }
 
-/* Function to delete a cookie. */
+/**
+ * Deletes a cookie based on a given key.
+ * @param key
+ *   The key to look for.
+ */
 function delete_cookie(key) {
 	document.cookie = key + '=; expires=Thu, 01-Jan-70 00:00:01 GMT;';
 }
